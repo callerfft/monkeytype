@@ -84,6 +84,20 @@ export function Nav(): JSXElement {
       <Button
         variant="text"
         fa={{
+          icon: "fa-language",
+          fixedWidth: true,
+        }}
+        router-link
+        href="/"
+        class={buttonClass()}
+        dataset={{
+          "data-nav-item": "linguatype",
+        }}
+        balloon={{ text: "LinguaType Trainer", position: "down" }}
+      />
+      <Button
+        variant="text"
+        fa={{
           icon: "fa-keyboard",
           fixedWidth: true,
         }}
@@ -91,43 +105,9 @@ export function Nav(): JSXElement {
         href="/"
         class={buttonClass()}
         dataset={{
-          "data-nav-item": "test",
+          "data-nav-item": "trainer",
         }}
-        onClick={() => {
-          if (getActivePage() === "test") restartTestEvent.dispatch();
-        }}
-      />
-      <Button
-        variant="text"
-        fa={{
-          icon: "fa-crown",
-          fixedWidth: true,
-        }}
-        router-link
-        dataset={{
-          "data-nav-item": "leaderboards",
-        }}
-        class={buttonClass()}
-        href="/leaderboards"
-        onMouseEnter={() => {
-          prefetchLeaderboardPage();
-        }}
-      />
-      <Button
-        variant="text"
-        fa={{
-          icon: "fa-info",
-          fixedWidth: true,
-        }}
-        class={buttonClass()}
-        dataset={{
-          "data-nav-item": "about",
-        }}
-        href="/about"
-        router-link
-        onMouseEnter={() => {
-          prefetchAboutPage();
-        }}
+        balloon={{ text: "Practice", position: "down" }}
       />
       <Button
         variant="text"

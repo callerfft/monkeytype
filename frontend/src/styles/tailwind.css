@@ -12,6 +12,10 @@
   --color-error-extra: var(--error-extra-color);
   --color-colorful-error: var(--colorful-error-color);
   --color-colorful-error-extra: var(--colorful-error-extra-color);
+  --color-score-green: #22c55e;
+  --color-score-yellow: #eab308;
+  --color-score-red: #ef4444;
+
 
   /* decide on rem or em */
   --spacing: 0.25rem;
@@ -83,6 +87,19 @@
 @utility debug {
   border: 1px dashed hotpink !important;
 }
+
+@utility text-score-green {
+  color: #22c55e;
+}
+
+@utility text-score-yellow {
+  color: #eab308;
+}
+
+@utility text-score-red {
+  color: #ef4444;
+}
+
 
 @utility text-em-xs {
   font-size: 0.75em;

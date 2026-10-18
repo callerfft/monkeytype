@@ -21,8 +21,25 @@ import {
   onAuthStateChanged,
   indexedDBLocalPersistence,
   getAdditionalUserInfo,
+  sendSignInLinkToEmail,
+  isSignInWithEmailLink,
+  signInWithEmailLink,
+  type ActionCodeSettings,
 } from "firebase/auth";
-import { promiseWithResolvers } from "./utils/misc";
+
+function promiseWithResolvers<T = void>(): {
+  promise: Promise<T>;
+  resolve: (value: T | PromiseLike<T>) => void;
+  reject: (reason?: unknown) => void;
+} {
+  let resolve!: (value: T | PromiseLike<T>) => void;
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
+}
 import { isDevEnvironment } from "./utils/env";
 import { createErrorMessage } from "./utils/error";
 
@@ -33,7 +50,12 @@ import {
 import { tryCatch } from "@monkeytype/util/trycatch";
 import { googleSignUpEvent } from "./events/google-sign-up";
 import { addBanner } from "./states/banners";
-import { setUserId, setUserVerified } from "./states/core";
+import {
+  getUserId,
+  isUserVerified,
+  setUserId,
+  setUserVerified,
+} from "./states/core";
 
 let app: FirebaseApp | undefined;
 let Auth: AuthType | undefined;
@@ -149,6 +171,27 @@ export function setUserState(
   }
 }
 
+/**
+ * Returns current user authentication state or null if unauthenticated.
+ */
+export function getUserState(): { uid: string; emailVerified: boolean } | null {
+  const user = getAuthenticatedUser();
+  if (user) {
+    return {
+      uid: user.uid,
+      emailVerified: user.emailVerified,
+    };
+  }
+  const uid = getUserId();
+  if (uid !== null) {
+    return {
+      uid,
+      emailVerified: isUserVerified(),
+    };
+  }
+  return null;
+}
+
 export async function signInWithPopup(
   provider: AuthProvider,
   rememberMe: boolean,
@@ -195,6 +238,92 @@ export async function getIdToken(): Promise<string | null> {
   if (user === null) return null;
   return firebaseGetIdToken(user);
 }
+
+/**
+ * Sends a passwordless sign-in (Magic Link) to the specified email address.
+ * Preserves the email in localStorage to facilitate seamless sign-in completion.
+ */
+export async function sendMagicLink(
+  email: string,
+  actionCodeSettings?: ActionCodeSettings,
+): Promise<void> {
+  if (Auth === undefined) throw new Error("Authentication uninitialized");
+
+  const defaultActionCodeSettings: ActionCodeSettings = {
+    url:
+      typeof window !== "undefined" && window.location
+        ? window.location.href
+        : "http://localhost:8000/linguatype",
+    handleCodeInApp: true,
+  };
+
+  const settings = actionCodeSettings ?? defaultActionCodeSettings;
+
+  const { error } = await tryCatch(
+    sendSignInLinkToEmail(Auth, email, settings),
+  );
+  if (error !== null) {
+    console.error(error);
+    throw translateFirebaseError(error, "Failed to send sign-in link to email");
+  }
+
+  if (typeof window !== "undefined" && window.localStorage) {
+    window.localStorage.setItem("emailForSignIn", email);
+  }
+}
+
+/**
+ * Checks if the given URL corresponds to a Firebase email sign-in link.
+ */
+export function isMagicLink(url: string): boolean {
+  if (typeof url !== "string" || !url) return false;
+  if (Auth === undefined) {
+    // Robust fallback verification when Auth instance is not yet initialized
+    return (
+      url.includes("apiKey=") &&
+      (url.includes("oobCode=") || url.includes("mode=signIn"))
+    );
+  }
+  return isSignInWithEmailLink(Auth, url);
+}
+
+/**
+ * Completes sign-in with a passwordless magic link.
+ */
+export async function completeMagicLinkSignIn(
+  email: string,
+  url: string,
+): Promise<UserCredential> {
+  if (Auth === undefined) throw new Error("Authentication uninitialized");
+
+  const { data: userCredential, error } = await tryCatch(
+    signInWithEmailLink(Auth, email, url),
+  );
+  if (error !== null) {
+    console.error(error);
+    throw translateFirebaseError(error, "Failed to sign in with email link");
+  }
+
+  if (userCredential?.user) {
+    setUserState(userCredential.user);
+    if (typeof window !== "undefined" && window.localStorage) {
+      window.localStorage.removeItem("emailForSignIn");
+    }
+    await readyCallback?.(true, userCredential.user);
+  }
+
+  return userCredential;
+}
+
+export function setAuthForTesting(mockAuth: AuthType | undefined): void {
+  Auth = mockAuth;
+}
+
+export function setReadyCallbackForTesting(cb: ReadyCallback | undefined): void {
+  readyCallback = cb;
+}
+
+export type { ActionCodeSettings };
 async function setPersistence(
   rememberMe: boolean,
   store = false,

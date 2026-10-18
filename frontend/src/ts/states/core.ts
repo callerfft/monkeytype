@@ -1,5 +1,5 @@
 import { createMemo, createSignal } from "solid-js";
-import { PageName } from "../pages/page";
+import type { PageName } from "../pages/page";
 import { Formatting } from "../utils/format";
 import { getConfig } from "../config/store";
 

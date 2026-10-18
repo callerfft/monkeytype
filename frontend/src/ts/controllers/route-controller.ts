@@ -51,13 +51,19 @@ const routes: Route[] = [
   {
     path: "/",
     load: async (_params, options) => {
-      await PageController.change("test", options);
+      await PageController.change("linguatype", options);
     },
   },
   {
     path: "/verify",
     load: async (_params, options) => {
-      await PageController.change("test", options);
+      await PageController.change("linguatype", options);
+    },
+  },
+  {
+    path: "/linguatype",
+    load: async (_params, options) => {
+      await PageController.change("linguatype", options);
     },
   },
   {

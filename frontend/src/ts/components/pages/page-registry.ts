@@ -11,6 +11,7 @@ import { ProfilePage } from "./profile/ProfilePage";
 import { ProfileSearchPage } from "./profile/ProfileSearchPage";
 import { SettingsPage } from "./settings/SettingsPage";
 import { TestPage } from "./test/TestPage";
+import { LinguaTypePage } from "./linguatype/LinguaTypePage";
 
 /** Every page's component and wrapper options, rendered by `Pages`. */
 export const pageRegistry: PageRegistry = {
@@ -19,7 +20,7 @@ export const pageRegistry: PageRegistry = {
     class:
       "grid h-full w-full content-center items-center gap-4 place-self-center text-center",
   },
-  test: { component: TestPage, class: "full-width content-grid" },
+  test: { component: LinguaTypePage, class: "full-width content-grid" },
   settings: { component: SettingsPage },
   about: { component: AboutPage, class: "full-width" },
   account: { component: AccountPage, needsAuthentication: true },
@@ -30,4 +31,5 @@ export const pageRegistry: PageRegistry = {
   accountSettings: { component: AccountSettingsPage },
   leaderboards: { component: LeaderboardPage },
   friends: { component: FriendsPage },
+  linguatype: { component: LinguaTypePage, class: "full-width content-grid" },
 };

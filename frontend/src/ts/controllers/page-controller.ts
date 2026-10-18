@@ -63,6 +63,7 @@ export function isNavigating(): boolean {
 const pages = {
   loading: page("loading"),
   test: page("test"),
+  linguatype: page("linguatype"),
   settings: page("settings"),
   about: page("about"),
   account: page("account", {

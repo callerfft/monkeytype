@@ -1,0 +1,1328 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "LinguaType API",
+    "version": "1.0.0",
+    "description": "API contract for LinguaType: low-latency, gamified translation and sentence construction trainer based on Monkeytype with streaming evaluation via fast LLMs (latency < 3s).",
+    "contact": {
+      "name": "LinguaType Team"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Local development backend server"
+    },
+    {
+      "url": "/api/v1",
+      "description": "Production API base path"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Sessions",
+      "description": "Game session creation, configuration, and state retrieval"
+    },
+    {
+      "name": "Evaluation",
+      "description": "Low-latency streaming (SSE) and synchronous submission evaluation"
+    },
+    {
+      "name": "User & Settings",
+      "description": "User profile, language/style preferences, and session history"
+    },
+    {
+      "name": "Prompts",
+      "description": "Prompt catalog and difficulty management"
+    },
+    {
+      "name": "Health & Benchmarking",
+      "description": "System health, model readiness, and automated latency validation"
+    }
+  ],
+  "paths": {
+    "/api/v1/sessions": {
+      "post": {
+        "tags": ["Sessions"],
+        "summary": "Create a new LinguaType game session",
+        "description": "Initializes a game session for Mode A (phrase translation) or Mode B (situation/image prompt) with selected constraints (timer: 15s/30s/60s, word limits, input mode).",
+        "operationId": "createSession",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Session created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid session parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access when authenticated session is required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sessions/{session_id}": {
+      "get": {
+        "tags": ["Sessions"],
+        "summary": "Get session details and prompt by ID",
+        "description": "Retrieves the session state, prompt content, time constraints, and completion status.",
+        "operationId": "getSessionById",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "description": "Unique session identifier",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Session not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sessions/{session_id}/evaluate": {
+      "post": {
+        "tags": ["Evaluation"],
+        "summary": "Stream evaluation feedback via Server-Sent Events (SSE)",
+        "description": "Accepts user text input and streams progressive evaluation events (grammar error spans, semantic validation, exactly one stylistic alternative, speed metrics, latency breakdown). Target latency: TTFT < 800ms, total inference < 2500ms, end-to-end pipeline < 3000ms.",
+        "operationId": "evaluateSessionStream",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "description": "Unique session identifier",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvaluationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Server-Sent Events stream delivering real-time evaluation chunks and structured JSON events",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/SSEStreamEvent"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid evaluation payload or text exceeds constraints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Session not found or expired",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "LLM evaluation timeout exceeded (> 3s)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sessions/{session_id}/evaluate/sync": {
+      "post": {
+        "tags": ["Evaluation"],
+        "summary": "Synchronous evaluation (batch / non-streaming fallback)",
+        "description": "Non-streaming fallback for clients or unit tests that require the complete evaluation result in a single JSON payload.",
+        "operationId": "evaluateSessionSync",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "description": "Unique session identifier",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvaluationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Complete evaluation result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluationResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid submission payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Session not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/user/profile": {
+      "get": {
+        "tags": ["User & Settings"],
+        "summary": "Get current user profile and settings",
+        "description": "Fetches user configuration including native/target languages, preferred style, loose phrasing allowance, and input mode.",
+        "operationId": "getUserProfile",
+        "security": [
+          {
+            "FirebaseAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid Firebase token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["User & Settings"],
+        "summary": "Update user settings and preferences",
+        "description": "Updates language pairs, style preferences, and default input configurations.",
+        "operationId": "updateUserProfile",
+        "security": [
+          {
+            "FirebaseAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserProfileUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error in updated preferences",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/results": {
+      "get": {
+        "tags": ["User & Settings"],
+        "summary": "Retrieve user session history and game results",
+        "description": "Returns paginated list of past game results for the authenticated user, with accuracy, WPM, grammar errors, and style suggestions.",
+        "operationId": "getResultsHistory",
+        "security": [
+          {
+            "FirebaseAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Maximum number of items to return (default 20, max 100)",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Offset from beginning of dataset",
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "mode",
+            "in": "query",
+            "required": false,
+            "description": "Filter by game mode",
+            "schema": {
+              "type": "string",
+              "enum": ["translation", "situation_image"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated history retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistoryListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/prompts": {
+      "get": {
+        "tags": ["Prompts"],
+        "summary": "List available curated prompts",
+        "description": "Fetches curated prompts filtered by mode, source/target languages, and difficulty level.",
+        "operationId": "listPrompts",
+        "parameters": [
+          {
+            "name": "mode",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["translation", "situation_image"]
+            }
+          },
+          {
+            "name": "source_language",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "target_language",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "difficulty",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["easy", "medium", "hard"]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of matching prompts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Prompt"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "tags": ["Health & Benchmarking"],
+        "summary": "Service health check",
+        "description": "Returns operational status of the FastAPI backend and connectivity to LLM provider.",
+        "operationId": "healthCheck",
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/benchmark/latency": {
+      "post": {
+        "tags": ["Health & Benchmarking"],
+        "summary": "Run automated latency verification benchmark",
+        "description": "Executes synthetic benchmark evaluation tests against the LLM provider to measure TTFT and total inference duration, verifying compliance with the <2.5s inference and <3.0s total pipeline SLA.",
+        "operationId": "runLatencyBenchmark",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LatencyBenchmarkRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Benchmark execution results and latency statistics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LatencyBenchmarkResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Benchmark execution failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "FirebaseAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Firebase ID Token passed as standard Bearer token in the Authorization header"
+      }
+    },
+    "schemas": {
+      "SessionCreateRequest": {
+        "type": "object",
+        "required": ["mode", "source_language", "target_language"],
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": ["translation", "situation_image"],
+            "description": "Game mode: Mode A (translation) or Mode B (situation/image prompt)"
+          },
+          "timer_seconds": {
+            "type": ["integer", "null"],
+            "enum": [15, 30, 60, null],
+            "default": 30,
+            "description": "Time limit in seconds (15s, 30s, or 60s; null for untimed word-limit mode)"
+          },
+          "target_word_count": {
+            "type": "integer",
+            "minimum": 3,
+            "maximum": 50,
+            "default": 10,
+            "description": "Target word count for the sentence"
+          },
+          "margin_buffer": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 15,
+            "default": 5,
+            "description": "Additional allowed word count buffer beyond target_word_count"
+          },
+          "source_language": {
+            "type": "string",
+            "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+            "default": "ru",
+            "description": "Source/native language ISO code (e.g., 'ru', 'uz', 'es')"
+          },
+          "target_language": {
+            "type": "string",
+            "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+            "default": "en",
+            "description": "Target learning language ISO code (e.g., 'en')"
+          },
+          "difficulty": {
+            "type": "string",
+            "enum": ["easy", "medium", "hard"],
+            "default": "medium",
+            "description": "Prompt vocabulary and complexity difficulty"
+          },
+          "input_mode": {
+            "type": "string",
+            "enum": ["free", "scaffolding"],
+            "default": "free",
+            "description": "Free typing input or guided scaffolding assist"
+          },
+          "preferred_style": {
+            "type": "string",
+            "enum": ["conversational", "formal", "concise", "academic", "business"],
+            "default": "conversational",
+            "description": "Preferred stylistic tone for recommended alternative"
+          },
+          "allow_loose_phrasing": {
+            "type": "boolean",
+            "default": true,
+            "description": "Whether semantic verification allows idiomatic and loose phrasing"
+          }
+        }
+      },
+      "Prompt": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "source_language",
+          "target_language",
+          "content",
+          "difficulty",
+          "target_word_count",
+          "margin_buffer",
+          "max_word_count"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique prompt identifier"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["translation", "situation_image"],
+            "description": "Prompt type"
+          },
+          "source_language": {
+            "type": "string",
+            "description": "Language of prompt"
+          },
+          "target_language": {
+            "type": "string",
+            "description": "Expected language for user submission"
+          },
+          "content": {
+            "type": "string",
+            "description": "Prompt textual content (phrase to translate or situation description)"
+          },
+          "image_url": {
+            "type": ["string", "null"],
+            "format": "uri",
+            "description": "URL to image if Mode B situation uses an illustration"
+          },
+          "difficulty": {
+            "type": "string",
+            "enum": ["easy", "medium", "hard"]
+          },
+          "target_word_count": {
+            "type": "integer"
+          },
+          "margin_buffer": {
+            "type": "integer"
+          },
+          "max_word_count": {
+            "type": "integer",
+            "description": "Upper hard cap on words (target_word_count + margin_buffer)"
+          }
+        }
+      },
+      "SessionResponse": {
+        "type": "object",
+        "required": [
+          "session_id",
+          "status",
+          "mode",
+          "prompt",
+          "timer_seconds",
+          "input_mode",
+          "preferred_style",
+          "allow_loose_phrasing",
+          "created_at",
+          "expires_at"
+        ],
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "completed", "cancelled", "expired"]
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["translation", "situation_image"]
+          },
+          "prompt": {
+            "$ref": "#/components/schemas/Prompt"
+          },
+          "timer_seconds": {
+            "type": ["integer", "null"]
+          },
+          "input_mode": {
+            "type": "string",
+            "enum": ["free", "scaffolding"]
+          },
+          "preferred_style": {
+            "type": "string",
+            "enum": ["conversational", "formal", "concise", "academic", "business"]
+          },
+          "allow_loose_phrasing": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "EvaluationRequest": {
+        "type": "object",
+        "required": ["user_text", "time_spent_ms", "words_typed"],
+        "properties": {
+          "user_text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000,
+            "description": "Raw text submitted by user"
+          },
+          "time_spent_ms": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total active time in milliseconds from first keypress to submission"
+          },
+          "words_typed": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total count of whitespace-delimited words typed"
+          },
+          "character_count": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total characters typed"
+          },
+          "keystroke_count": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Raw count of keystrokes registered"
+          }
+        }
+      },
+      "GrammarErrorSpan": {
+        "type": "object",
+        "required": ["start", "end", "original_text", "message", "suggestion", "category", "severity"],
+        "properties": {
+          "start": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "0-based start index inclusive in user_text"
+          },
+          "end": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "0-based end index exclusive in user_text"
+          },
+          "original_text": {
+            "type": "string",
+            "description": "Exact text excerpt containing error"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable explanation of the grammatical issue"
+          },
+          "suggestion": {
+            "type": "string",
+            "description": "Recommended correction replacement for this span"
+          },
+          "category": {
+            "type": "string",
+            "enum": ["grammar", "spelling", "punctuation", "syntax", "word_choice", "agreement", "tense"],
+            "description": "Category of error"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["error", "warning", "info"],
+            "description": "Severity level for UI rendering and scoring"
+          }
+        }
+      },
+      "SemanticValidation": {
+        "type": "object",
+        "required": ["is_valid", "score", "explanation", "missing_concepts"],
+        "properties": {
+          "is_valid": {
+            "type": "boolean",
+            "description": "True if meaning matches prompt intent, allowing loose phrasing"
+          },
+          "score": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Semantic preservation score from 0 (completely wrong) to 100 (exact match)"
+          },
+          "explanation": {
+            "type": "string",
+            "description": "Concise reasoning for the semantic validation verdict"
+          },
+          "missing_concepts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Key conceptual elements omitted by user (empty if valid)"
+          }
+        }
+      },
+      "StyleAlternative": {
+        "type": "object",
+        "required": ["style", "text", "explanation"],
+        "properties": {
+          "style": {
+            "type": "string",
+            "enum": ["conversational", "formal", "concise", "academic", "business"],
+            "description": "Stylistic register applied"
+          },
+          "text": {
+            "type": "string",
+            "description": "Exactly ONE optimized alternative sentence matching the user's preferred style"
+          },
+          "explanation": {
+            "type": "string",
+            "description": "Brief explanation of how this alternative improves phrasing or style"
+          }
+        }
+      },
+      "SessionMetrics": {
+        "type": "object",
+        "required": [
+          "wpm",
+          "accuracy_score",
+          "time_spent_ms",
+          "word_count",
+          "target_word_count",
+          "word_limit_exceeded",
+          "timer_expired"
+        ],
+        "properties": {
+          "wpm": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Typing speed in Words Per Minute ((chars / 5) / (minutes))"
+          },
+          "accuracy_score": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Overall score taking into account grammar, semantic match, and length"
+          },
+          "time_spent_ms": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "word_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "target_word_count": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "word_limit_exceeded": {
+            "type": "boolean",
+            "description": "True if word count exceeded max_word_count (target + buffer)"
+          },
+          "timer_expired": {
+            "type": "boolean",
+            "description": "True if user was cut off by timer reaching 0"
+          }
+        }
+      },
+      "LatencyBreakdown": {
+        "type": "object",
+        "required": ["ttft_ms", "inference_duration_ms", "pipeline_duration_ms"],
+        "properties": {
+          "ttft_ms": {
+            "type": "number",
+            "description": "Time To First Token in milliseconds (< 800ms SLA)"
+          },
+          "inference_duration_ms": {
+            "type": "number",
+            "description": "Total LLM inference duration in milliseconds (< 2500ms SLA)"
+          },
+          "pipeline_duration_ms": {
+            "type": "number",
+            "description": "Total end-to-end processing duration in milliseconds (< 3000ms SLA)"
+          }
+        }
+      },
+      "EvaluationResult": {
+        "type": "object",
+        "required": [
+          "result_id",
+          "session_id",
+          "user_id",
+          "user_text",
+          "semantic_validation",
+          "grammar_errors",
+          "style_alternative",
+          "metrics",
+          "latency",
+          "created_at"
+        ],
+        "properties": {
+          "result_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "session_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "user_id": {
+            "type": ["string", "null"],
+            "description": "Firebase UID or null for guest"
+          },
+          "user_text": {
+            "type": "string"
+          },
+          "semantic_validation": {
+            "$ref": "#/components/schemas/SemanticValidation"
+          },
+          "grammar_errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GrammarErrorSpan"
+            }
+          },
+          "style_alternative": {
+            "$ref": "#/components/schemas/StyleAlternative"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/SessionMetrics"
+          },
+          "latency": {
+            "$ref": "#/components/schemas/LatencyBreakdown"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SSEStreamEvent": {
+        "type": "object",
+        "description": "Structured Server-Sent Event emitted during streaming evaluation",
+        "required": ["event", "data"],
+        "properties": {
+          "event": {
+            "type": "string",
+            "enum": [
+              "session_start",
+              "token",
+              "grammar_errors",
+              "semantic_check",
+              "style_alternative",
+              "metrics",
+              "done",
+              "error"
+            ],
+            "description": "SSE event name"
+          },
+          "data": {
+            "description": "JSON-encoded payload corresponding to event name",
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "status": { "type": "string" },
+                  "session_id": { "type": "string", "format": "uuid" }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "token": { "type": "string" },
+                  "index": { "type": "integer" }
+                }
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "errors": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/GrammarErrorSpan" }
+                  }
+                }
+              },
+              {
+                "$ref": "#/components/schemas/SemanticValidation"
+              },
+              {
+                "$ref": "#/components/schemas/StyleAlternative"
+              },
+              {
+                "$ref": "#/components/schemas/SessionMetrics"
+              },
+              {
+                "$ref": "#/components/schemas/EvaluationResult"
+              },
+              {
+                "$ref": "#/components/schemas/ErrorResponse"
+              }
+            ]
+          }
+        }
+      },
+      "UserProfile": {
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "native_language",
+          "target_language",
+          "preferred_style",
+          "allow_loose_phrasing",
+          "input_mode",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Firebase UID"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "display_name": {
+            "type": ["string", "null"]
+          },
+          "native_language": {
+            "type": "string",
+            "default": "ru"
+          },
+          "target_language": {
+            "type": "string",
+            "default": "en"
+          },
+          "preferred_style": {
+            "type": "string",
+            "enum": ["conversational", "formal", "concise", "academic", "business"],
+            "default": "conversational"
+          },
+          "allow_loose_phrasing": {
+            "type": "boolean",
+            "default": true
+          },
+          "input_mode": {
+            "type": "string",
+            "enum": ["free", "scaffolding"],
+            "default": "free"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UserProfileUpdate": {
+        "type": "object",
+        "properties": {
+          "native_language": {
+            "type": "string"
+          },
+          "target_language": {
+            "type": "string"
+          },
+          "preferred_style": {
+            "type": "string",
+            "enum": ["conversational", "formal", "concise", "academic", "business"]
+          },
+          "allow_loose_phrasing": {
+            "type": "boolean"
+          },
+          "input_mode": {
+            "type": "string",
+            "enum": ["free", "scaffolding"]
+          }
+        }
+      },
+      "GameResultSummary": {
+        "type": "object",
+        "required": [
+          "id",
+          "session_id",
+          "mode",
+          "source_language",
+          "target_language",
+          "prompt_content",
+          "user_text",
+          "time_spent_ms",
+          "wpm",
+          "accuracy_score",
+          "semantic_valid",
+          "error_count",
+          "recommended_variant",
+          "preferred_style",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "session_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["translation", "situation_image"]
+          },
+          "source_language": {
+            "type": "string"
+          },
+          "target_language": {
+            "type": "string"
+          },
+          "prompt_content": {
+            "type": "string"
+          },
+          "user_text": {
+            "type": "string"
+          },
+          "time_spent_ms": {
+            "type": "integer"
+          },
+          "wpm": {
+            "type": "number"
+          },
+          "accuracy_score": {
+            "type": "integer"
+          },
+          "semantic_valid": {
+            "type": "boolean"
+          },
+          "error_count": {
+            "type": "integer"
+          },
+          "recommended_variant": {
+            "type": "string"
+          },
+          "preferred_style": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "HistoryListResponse": {
+        "type": "object",
+        "required": ["results", "total", "offset", "limit"],
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameResultSummary"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "HealthStatus": {
+        "type": "object",
+        "required": ["status", "service", "version", "llm_connected"],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["ok", "degraded", "down"]
+          },
+          "service": {
+            "type": "string",
+            "default": "linguatype-backend"
+          },
+          "version": {
+            "type": "string",
+            "default": "1.0.0"
+          },
+          "llm_connected": {
+            "type": "boolean"
+          },
+          "llm_provider": {
+            "type": "string",
+            "default": "google-gemini-flash"
+          }
+        }
+      },
+      "LatencyBenchmarkRequest": {
+        "type": "object",
+        "properties": {
+          "iterations": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10,
+            "default": 3
+          },
+          "model": {
+            "type": "string",
+            "default": "gemini-2.0-flash"
+          },
+          "test_prompt": {
+            "type": "string",
+            "default": "Опишите ваш утренний распорядок дня."
+          },
+          "test_submission": {
+            "type": "string",
+            "default": "Every morning I wake up at seven o'clock and drink a hot cup of coffee before starting my work."
+          }
+        }
+      },
+      "LatencyPercentiles": {
+        "type": "object",
+        "required": ["min", "max", "avg", "p95"],
+        "properties": {
+          "min": { "type": "number" },
+          "max": { "type": "number" },
+          "avg": { "type": "number" },
+          "p95": { "type": "number" }
+        }
+      },
+      "LatencyBenchmarkResponse": {
+        "type": "object",
+        "required": [
+          "timestamp",
+          "iterations",
+          "ttft_ms",
+          "inference_duration_ms",
+          "pipeline_duration_ms",
+          "meets_constraint"
+        ],
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "iterations": {
+            "type": "integer"
+          },
+          "ttft_ms": {
+            "$ref": "#/components/schemas/LatencyPercentiles"
+          },
+          "inference_duration_ms": {
+            "$ref": "#/components/schemas/LatencyPercentiles"
+          },
+          "pipeline_duration_ms": {
+            "$ref": "#/components/schemas/LatencyPercentiles"
+          },
+          "meets_constraint": {
+            "type": "boolean",
+            "description": "True if p95 inference_duration_ms < 2500ms and pipeline_duration_ms < 3000ms"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["code", "message"],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Standardized machine-readable error code (e.g. VALIDATION_ERROR, SESSION_NOT_FOUND, LLM_TIMEOUT, UNAUTHORIZED)"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable explanation of error"
+          },
+          "details": {
+            "type": ["object", "array", "string", "null"],
+            "description": "Optional debugging details or field-level validation errors"
+          }
+        }
+      }
+    }
+  }
+}

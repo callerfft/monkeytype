@@ -53,8 +53,45 @@ export const sortedThemes: ThemeWithName[] = [...ThemesList].sort((a, b) => {
 export function Theme(): JSXElement {
   const customThemes = useCustomThemesLiveQuery();
 
+  const classicTheme = () => sortedThemes.find((t) => t.name === "classic");
+
   const Presets = () => (
     <div class="grid gap-4">
+      {/* Pinned Classic Theme Banner */}
+      <Show when={classicTheme()}>
+        {(theme) => (
+          <div class="flex items-center justify-between rounded-(--roundness) border border-main/30 bg-sub-alt/40 p-3">
+            <div class="flex items-center gap-3">
+              <Fa icon="fa-thumbtack" class="text-main" />
+              <div class="flex flex-col">
+                <span class="text-xs font-semibold text-text uppercase">
+                  Pinned: Classic
+                </span>
+                <span class="font-mono text-[11px] text-sub">
+                  #000000 black • #e2b714 yellow
+                </span>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <ThemeBubbles inset={false} colors={theme()} />
+              <Button
+                variant="button"
+                class="px-3 py-1 text-xs"
+                text={
+                  getConfig.theme === "classic" && !getConfig.customTheme
+                    ? "active"
+                    : "apply"
+                }
+                onClick={() => {
+                  setConfig("theme", "classic");
+                  setConfig("customTheme", false);
+                }}
+              />
+            </div>
+          </div>
+        )}
+      </Show>
+
       <Show when={getConfig.favThemes.length > 0}>
         <div class="grid grid-cols-[repeat(auto-fill,minmax(17rem,1fr))] gap-2">
           <For

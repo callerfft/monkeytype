@@ -1,0 +1,30 @@
+# apphosting.yaml - Firebase App Hosting deployment configuration for LinguaType
+
+# Cloud Run service configuration
+runConfig:
+  cpu: 1
+  memoryMiB: 1024
+  minInstances: 1 # Keep warm container to prevent cold starts and meet <3.0s latency SLA
+  maxInstances: 5
+  concurrency: 80
+
+# Environment variables
+env:
+  - variable: NODE_ENV
+    value: production
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: PORT
+    value: "8080"
+    availability:
+      - RUNTIME
+  - variable: BACKEND_URL
+    value: http://localhost:8000
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: LINGUATYPE_AUTH_MODE
+    value: production
+    availability:
+      - RUNTIME

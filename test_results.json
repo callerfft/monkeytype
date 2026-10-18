@@ -1,0 +1,922 @@
+[
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Valid Mode A minimal",
+    "description": "Minimal Mode A required fields only",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Valid Mode B full",
+    "description": "Full valid Mode B with all fields specified",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Valid timer: 15",
+    "description": "Timer 15 is in enum [15, 30, 60, null]",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Valid timer: 30",
+    "description": "Timer 30 is in enum [15, 30, 60, null]",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Valid timer: 60",
+    "description": "Timer 60 is in enum [15, 30, 60, null]",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Valid timer: None",
+    "description": "Timer None is in enum [15, 30, 60, null]",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid timer: 45",
+    "description": "Timer 45 violates enum/type",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "45 is not one of [15, 30, 60, None] (path: ['timer_seconds'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid timer: 0",
+    "description": "Timer 0 violates enum/type",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "0 is not one of [15, 30, 60, None] (path: ['timer_seconds'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid timer: -10",
+    "description": "Timer -10 violates enum/type",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "-10 is not one of [15, 30, 60, None] (path: ['timer_seconds'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid timer: 120",
+    "description": "Timer 120 violates enum/type",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "120 is not one of [15, 30, 60, None] (path: ['timer_seconds'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid timer: 30",
+    "description": "Timer 30 violates enum/type",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "'30' is not of type 'integer', 'null' (path: ['timer_seconds'])",
+      "'30' is not one of [15, 30, 60, None] (path: ['timer_seconds'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid timer: 15.5",
+    "description": "Timer 15.5 violates enum/type",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "15.5 is not of type 'integer', 'null' (path: ['timer_seconds'])",
+      "15.5 is not one of [15, 30, 60, None] (path: ['timer_seconds'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid mode: arcade",
+    "description": "Mode arcade violates enum ['translation', 'situation_image']",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "'arcade' is not one of ['translation', 'situation_image'] (path: ['mode'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid mode: speed",
+    "description": "Mode speed violates enum ['translation', 'situation_image']",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "'speed' is not one of ['translation', 'situation_image'] (path: ['mode'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid mode: ",
+    "description": "Mode  violates enum ['translation', 'situation_image']",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "'' is not one of ['translation', 'situation_image'] (path: ['mode'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid mode: 123",
+    "description": "Mode 123 violates enum ['translation', 'situation_image']",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "123 is not of type 'string' (path: ['mode'])",
+      "123 is not one of ['translation', 'situation_image'] (path: ['mode'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Valid target_word_count boundary: 3",
+    "description": "target_word_count=3 satisfies 3 <= wc <= 50",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Valid target_word_count boundary: 10",
+    "description": "target_word_count=10 satisfies 3 <= wc <= 50",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Valid target_word_count boundary: 50",
+    "description": "target_word_count=50 satisfies 3 <= wc <= 50",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid target_word_count boundary: 2",
+    "description": "target_word_count=2 outside 3..50",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "2 is less than the minimum of 3 (path: ['target_word_count'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid target_word_count boundary: 0",
+    "description": "target_word_count=0 outside 3..50",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "0 is less than the minimum of 3 (path: ['target_word_count'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid target_word_count boundary: -5",
+    "description": "target_word_count=-5 outside 3..50",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "-5 is less than the minimum of 3 (path: ['target_word_count'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid target_word_count boundary: 51",
+    "description": "target_word_count=51 outside 3..50",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "51 is greater than the maximum of 50 (path: ['target_word_count'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid target_word_count boundary: 100",
+    "description": "target_word_count=100 outside 3..50",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "100 is greater than the maximum of 50 (path: ['target_word_count'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Valid margin_buffer boundary: 0",
+    "description": "margin_buffer=0 satisfies 0 <= mb <= 15",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Valid margin_buffer boundary: 5",
+    "description": "margin_buffer=5 satisfies 0 <= mb <= 15",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Valid margin_buffer boundary: 15",
+    "description": "margin_buffer=15 satisfies 0 <= mb <= 15",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid margin_buffer boundary: -1",
+    "description": "margin_buffer=-1 outside 0..15",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "-1 is less than the minimum of 0 (path: ['margin_buffer'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid margin_buffer boundary: 16",
+    "description": "margin_buffer=16 outside 0..15",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "16 is greater than the maximum of 15 (path: ['margin_buffer'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid margin_buffer boundary: 25",
+    "description": "margin_buffer=25 outside 0..15",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "25 is greater than the maximum of 15 (path: ['margin_buffer'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Valid language code: ru",
+    "description": "Language ru matches ISO regex",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Valid language code: en",
+    "description": "Language en matches ISO regex",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Valid language code: uz",
+    "description": "Language uz matches ISO regex",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Valid language code: en-US",
+    "description": "Language en-US matches ISO regex",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Valid language code: es-ES",
+    "description": "Language es-ES matches ISO regex",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid language code: RUS",
+    "description": "Language RUS violates ISO regex",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "'RUS' does not match '^[a-z]{2}(-[A-Z]{2})?$' (path: ['source_language'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid language code: en_US",
+    "description": "Language en_US violates ISO regex",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "'en_US' does not match '^[a-z]{2}(-[A-Z]{2})?$' (path: ['source_language'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid language code: english",
+    "description": "Language english violates ISO regex",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "'english' does not match '^[a-z]{2}(-[A-Z]{2})?$' (path: ['source_language'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid language code: 12",
+    "description": "Language 12 violates ISO regex",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "'12' does not match '^[a-z]{2}(-[A-Z]{2})?$' (path: ['source_language'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid language code: e",
+    "description": "Language e violates ISO regex",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "'e' does not match '^[a-z]{2}(-[A-Z]{2})?$' (path: ['source_language'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid language code: en-us",
+    "description": "Language en-us violates ISO regex",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "'en-us' does not match '^[a-z]{2}(-[A-Z]{2})?$' (path: ['source_language'])"
+    ]
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Valid preferred_style: conversational",
+    "description": "Style conversational in enum",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Valid preferred_style: formal",
+    "description": "Style formal in enum",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Valid preferred_style: concise",
+    "description": "Style concise in enum",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Valid preferred_style: academic",
+    "description": "Style academic in enum",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Valid preferred_style: business",
+    "description": "Style business in enum",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SessionCreateRequest",
+    "case_name": "Invalid preferred_style: slang",
+    "description": "Style 'slang' not in enum",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "'slang' is not one of ['conversational', 'formal', 'concise', 'academic', 'business'] (path: ['preferred_style'])"
+    ]
+  },
+  {
+    "category": "EvaluationRequest",
+    "case_name": "Valid minimal EvaluationRequest",
+    "description": "Valid minimal payload",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "EvaluationRequest",
+    "case_name": "Valid full EvaluationRequest",
+    "description": "Full valid payload with metrics",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "EvaluationRequest",
+    "case_name": "Empty user_text (minLength=1)",
+    "description": "user_text empty string should fail minLength",
+    "expected_valid": false,
+    "actual_valid": true,
+    "passed": false,
+    "errors": []
+  },
+  {
+    "category": "EvaluationRequest",
+    "case_name": "Boundary max user_text (1000 chars)",
+    "description": "user_text 1000 chars should pass maxLength",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "EvaluationRequest",
+    "case_name": "Exceeded user_text (1001 chars)",
+    "description": "user_text 1001 chars should fail maxLength",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' is too long (path: ['user_text'])"
+    ]
+  },
+  {
+    "category": "EvaluationRequest",
+    "case_name": "Negative time_spent_ms",
+    "description": "time_spent_ms cannot be negative",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "-1 is less than the minimum of 0 (path: ['time_spent_ms'])"
+    ]
+  },
+  {
+    "category": "EvaluationRequest",
+    "case_name": "Negative words_typed",
+    "description": "words_typed cannot be negative",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "-1 is less than the minimum of 0 (path: ['words_typed'])"
+    ]
+  },
+  {
+    "category": "EvaluationRequest",
+    "case_name": "Missing words_typed",
+    "description": "words_typed is required",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "'words_typed' is a required property (path: [])"
+    ]
+  },
+  {
+    "category": "GrammarErrorSpan",
+    "case_name": "Valid GrammarErrorSpan",
+    "description": "Valid GrammarErrorSpan with all required fields",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "GrammarErrorSpan",
+    "case_name": "Negative start index",
+    "description": "start index must be >= 0",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "-1 is less than the minimum of 0 (path: ['start'])"
+    ]
+  },
+  {
+    "category": "GrammarErrorSpan",
+    "case_name": "Negative end index",
+    "description": "end index must be >= 0",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "-1 is less than the minimum of 0 (path: ['end'])"
+    ]
+  },
+  {
+    "category": "GrammarErrorSpan",
+    "case_name": "Valid category: grammar",
+    "description": "Category grammar in enum",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "GrammarErrorSpan",
+    "case_name": "Valid category: spelling",
+    "description": "Category spelling in enum",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "GrammarErrorSpan",
+    "case_name": "Valid category: punctuation",
+    "description": "Category punctuation in enum",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "GrammarErrorSpan",
+    "case_name": "Valid category: syntax",
+    "description": "Category syntax in enum",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "GrammarErrorSpan",
+    "case_name": "Valid category: word_choice",
+    "description": "Category word_choice in enum",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "GrammarErrorSpan",
+    "case_name": "Valid category: agreement",
+    "description": "Category agreement in enum",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "GrammarErrorSpan",
+    "case_name": "Valid category: tense",
+    "description": "Category tense in enum",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "GrammarErrorSpan",
+    "case_name": "Invalid category: vocabulary",
+    "description": "Category 'vocabulary' not in enum",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "'vocabulary' is not one of ['grammar', 'spelling', 'punctuation', 'syntax', 'word_choice', 'agreement', 'tense'] (path: ['category'])"
+    ]
+  },
+  {
+    "category": "GrammarErrorSpan",
+    "case_name": "Valid severity: error",
+    "description": "Severity error in enum",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "GrammarErrorSpan",
+    "case_name": "Valid severity: warning",
+    "description": "Severity warning in enum",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "GrammarErrorSpan",
+    "case_name": "Valid severity: info",
+    "description": "Severity info in enum",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "GrammarErrorSpan",
+    "case_name": "Invalid severity: critical",
+    "description": "Severity 'critical' not in enum",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "'critical' is not one of ['error', 'warning', 'info'] (path: ['severity'])"
+    ]
+  },
+  {
+    "category": "StyleAlternative",
+    "case_name": "Valid StyleAlternative",
+    "description": "Valid StyleAlternative with all required fields",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "StyleAlternative",
+    "case_name": "Missing explanation in StyleAlternative",
+    "description": "explanation is required",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "'explanation' is a required property (path: [])"
+    ]
+  },
+  {
+    "category": "StyleAlternative",
+    "case_name": "Invalid style enum in StyleAlternative",
+    "description": "style 'poetic' not in enum",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "'poetic' is not one of ['conversational', 'formal', 'concise', 'academic', 'business'] (path: ['style'])"
+    ]
+  },
+  {
+    "category": "LatencyBenchmarkResponse",
+    "case_name": "Valid LatencyBenchmarkResponse (compliant)",
+    "description": "Valid LatencyBenchmarkResponse with all percentiles and meets_constraint flag",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "LatencyBenchmarkResponse",
+    "case_name": "Missing p95 in percentiles",
+    "description": "p95 is required in LatencyPercentiles",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "'p95' is a required property (path: ['ttft_ms'])"
+    ]
+  },
+  {
+    "category": "LatencyBenchmarkResponse",
+    "case_name": "Missing meets_constraint boolean",
+    "description": "meets_constraint is a required property",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "'meets_constraint' is a required property (path: [])"
+    ]
+  },
+  {
+    "category": "Prompt",
+    "case_name": "Valid translation prompt",
+    "description": "Valid prompt schema",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "Prompt",
+    "case_name": "Missing required max_word_count",
+    "description": "max_word_count is required",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "'max_word_count' is a required property (path: [])"
+    ]
+  },
+  {
+    "category": "SessionResponse",
+    "case_name": "Valid SessionResponse",
+    "description": "Valid SessionResponse",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "UserProfile",
+    "case_name": "Valid UserProfile",
+    "description": "Valid user profile",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "HistoryListResponse",
+    "case_name": "Valid HistoryListResponse",
+    "description": "Valid history list",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "HealthStatus",
+    "case_name": "Valid HealthStatus",
+    "description": "Valid health status",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "ErrorResponse",
+    "case_name": "Valid ErrorResponse",
+    "description": "Valid ErrorResponse",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SSEStreamEvent (Real-world valid payloads)",
+    "case_name": "Event 'session_start' validation against SSEStreamEvent",
+    "description": "Real-world event payload for event='session_start'",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SSEStreamEvent (Real-world valid payloads)",
+    "case_name": "Event 'token' validation against SSEStreamEvent",
+    "description": "Real-world event payload for event='token'",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SSEStreamEvent (Real-world valid payloads)",
+    "case_name": "Event 'grammar_errors' validation against SSEStreamEvent",
+    "description": "Real-world event payload for event='grammar_errors'",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SSEStreamEvent (Real-world valid payloads)",
+    "case_name": "Event 'grammar_errors (wrapped object)' validation against SSEStreamEvent",
+    "description": "Real-world event payload for event='grammar_errors'",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SSEStreamEvent (Real-world valid payloads)",
+    "case_name": "Event 'semantic_check' validation against SSEStreamEvent",
+    "description": "Real-world event payload for event='semantic_check'",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SSEStreamEvent (Real-world valid payloads)",
+    "case_name": "Event 'style_alternative' validation against SSEStreamEvent",
+    "description": "Real-world event payload for event='style_alternative'",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SSEStreamEvent (Real-world valid payloads)",
+    "case_name": "Event 'metrics' validation against SSEStreamEvent",
+    "description": "Real-world event payload for event='metrics'",
+    "expected_valid": true,
+    "actual_valid": false,
+    "passed": false,
+    "errors": [
+      "{'wpm': 55.0, 'accuracy_score': 95.0, 'time_spent_ms': 4000, 'word_count': 6} is not valid under any of the given schemas (path: ['data'])"
+    ]
+  },
+  {
+    "category": "SSEStreamEvent (Real-world valid payloads)",
+    "case_name": "Event 'done' validation against SSEStreamEvent",
+    "description": "Real-world event payload for event='done'",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SSEStreamEvent (Real-world valid payloads)",
+    "case_name": "Event 'error' validation against SSEStreamEvent",
+    "description": "Real-world event payload for event='error'",
+    "expected_valid": true,
+    "actual_valid": true,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "category": "SSEStreamEvent (Invalid events)",
+    "case_name": "Event 'heartbeat' not in enum",
+    "description": "Event 'heartbeat' should fail enum check",
+    "expected_valid": false,
+    "actual_valid": false,
+    "passed": true,
+    "errors": [
+      "'heartbeat' is not one of ['session_start', 'token', 'grammar_errors', 'semantic_check', 'style_alternative', 'metrics', 'done', 'error'] (path: ['event'])"
+    ]
+  }
+]

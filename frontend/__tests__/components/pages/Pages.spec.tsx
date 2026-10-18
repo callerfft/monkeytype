@@ -65,6 +65,7 @@ const registry: PageRegistry = {
   accountSettings: { component: stubPage("accountSettings") },
   leaderboards: { component: stubPage("leaderboards") },
   friends: { component: stubPage("friends") },
+  linguatype: { component: stubPage("linguatype") },
 };
 
 function pagesInDom(): string[] {

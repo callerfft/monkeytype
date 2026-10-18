@@ -30,6 +30,7 @@ export const ThemeNameSchema = z.enum(
     "chaos_theory",
     "cheesecake",
     "cherry_blossom",
+    "classic",
     "comfy",
     "copper",
     "creamsicle",

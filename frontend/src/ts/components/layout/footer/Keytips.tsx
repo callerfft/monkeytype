@@ -14,14 +14,16 @@ export function Keytips(): JSXElement {
           "opacity-0": getFocus(),
         })}
       >
-        <div class="flex items-center gap-2">
-          <QuickRestartHotkey />
-          <span>- restart test</span>
+        <div class="flex items-center gap-2 text-xs">
+          <kbd class="rounded bg-sub/20 px-1 py-0.5 font-mono text-text">tab</kbd>
+          <span>+</span>
+          <kbd class="rounded bg-sub/20 px-1 py-0.5 font-mono text-text">enter</kbd>
+          <span>- submit / new prompt</span>
         </div>
 
-        <div class="flex items-center gap-2">
-          <CommandlineHotkey />
-          <span>- command line</span>
+        <div class="flex items-center gap-2 text-xs">
+          <kbd class="rounded bg-sub/20 px-1 py-0.5 font-mono text-text">esc</kbd>
+          <span>- reset session</span>
         </div>
       </div>
     </Show>

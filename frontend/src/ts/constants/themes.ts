@@ -359,6 +359,18 @@ export const themes: Record<ThemeName, Theme> = {
     colorfulError: "#ec182d",
     colorfulErrorExtra: "#6e0c16",
   },
+  classic: {
+    bg: "#000000",
+    caret: "#8a6c00",
+    main: "#e2b714",
+    sub: "#646669",
+    subAlt: "#2c2e31",
+    text: "#d1d0c5",
+    error: "#ca4754",
+    errorExtra: "#7e2a33",
+    colorfulError: "#ca4754",
+    colorfulErrorExtra: "#7e2a33",
+  },
   comfy: {
     bg: "#4a5b6e",
     caret: "#9ec1cc",
